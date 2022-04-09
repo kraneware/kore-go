@@ -1,4 +1,4 @@
-module github.com/kraneware/kore_go
+module github.com/kraneware/kore-go
 
 go 1.17
 

@@ -1,7 +1,7 @@
 package helper_test
 
 import (
-	"github.com/kraneware/kore_go/helper"
+	"github.com/kraneware/kore-go/helper"
 	"os"
 	"testing"
 
