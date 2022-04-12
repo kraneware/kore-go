@@ -2,24 +2,21 @@ package helper_test
 
 import (
 	"github.com/kraneware/kore-go/helper"
-	"os"
-	"testing"
-
-	"github.com/pkg/errors"
-
-	"github.com/stretchr/testify/assert"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"os"
+	"testing"
 )
 
-func TestGoPanicHandling(t *testing.T) {
-	var ch = make(chan bool)
-	helper.Go("anonymous_function_that_panics", func() {
-		ch <- true
-		panic(errors.New("TEST ERROR in TestGoPanicHandling. It should not fail"))
-	})
-	<-ch
+type TestStruct struct {
+	Key1 string `json:"key1"`
+	Key2 string `json:"key2"`
+	Key3 string `json:"key3"`
+}
+
+func TestHelper(t *testing.T) {
+	RegisterFailHandler(Fail)
+	RunSpecs(t, "helper test suite")
 }
 
 var _ = Describe("Env Tests", func() {
@@ -36,29 +33,27 @@ var _ = Describe("Env Tests", func() {
 			Expect(os.Getenv("TEST_KEY")).ShouldNot(Equal("TEST_VALUE"))
 		})
 	})
+
+	//Context("WriteToCSV() Test", func() {
+	//	It("should write to csv", func() {
+	//		testStruct := TestStruct{
+	//			Key1: "v1",
+	//			Key2: "v2",
+	//			Key3: "v3",
+	//		}
+	//		headers := []string{"header1", "header2", "header3"}
+	//		data := make([]map[string]interface{}, 1)
+	//		data[0] = map(
+	//			_: TestStruct{
+	//				Key1: "",
+	//				Key2: "",
+	//				Key3: "",
+	//			},
+	//	)
+	//
+	//		rows, err := helper.WriteToCSVFile("test.csv", headers, data)
+	//		Expect(err).ToNot(BeNil())
+	//		Expect(rows).To(BeEquivalentTo(1))
+	//	})
+	//})
 })
-
-func TestPanicRecovery(t *testing.T) {
-	a, b, err2 := myFunc()
-	assert.Equal(t, 1, a)
-	assert.Equal(t, 0, b)
-	assert.NotEmpty(t, err2)
-	assert.Contains(t, err2.Error(), "CHECK")
-}
-
-func myFunc() (a, b int, err error) {
-	defer helper.RecoverToErrorVar("myFunc", &err)
-	a = 1
-	if a == 1 {
-		err2 := errors.New("TEST ERROR in myFunc. Code = CHECK")
-		helper.ErrorHandlerf(err2, "myFunc", "%s", "arg")
-	}
-	b = 1
-	return
-}
-
-func TestRecoverAsLogErrorf(t *testing.T) {
-	defer helper.RecoverAsLogErrorf("%s", "arg")
-	err2 := errors.New("TEST ERROR in TestRecoverAsLogErrorf: should not fail")
-	helper.ErrorHandlerf(err2, "TestRecoverAsLogErrorf", "%s", "arg")
-}

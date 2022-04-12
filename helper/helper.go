@@ -118,3 +118,44 @@ func RecoverToErrorVar(name string, err *error) {
 		}
 	}
 }
+
+func WriteToCSVFile(filename string, header []string, data []map[string]interface{}) (int, error) {
+	handle, err := os.OpenFile(filename, os.O_CREATE, os.ModeAppend)
+	if err != nil {
+		return 0, err
+	}
+
+	rows := 0
+	for _, v := range data {
+
+		lrows, err2 := WriteToCSV(handle, header, v)
+		rows += lrows
+		if err2 != nil {
+			return rows, err2
+		}
+	}
+
+	return rows, nil
+}
+
+func WriteToCSV(handle *os.File, header []string, data map[string]interface{}) (int, error) {
+	rows := 0
+
+	for _, v := range header {
+		_, err := fmt.Fprintf(handle, "%s", v)
+		if err != nil {
+			return rows, err
+		}
+	}
+
+	for _, v := range data {
+		rows++
+
+		_, err := fmt.Fprintf(handle, "%+v", v)
+		if err != nil {
+			return rows, err
+		}
+	}
+
+	return rows, nil
+}
